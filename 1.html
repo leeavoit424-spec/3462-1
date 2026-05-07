@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手机计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+
+        /* 计算器主体 */
+        .calculator {
+            width: 100%;
+            max-width: 380px;
+            background-color: #2d2d2d;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 显示区域 */
+        .display {
+            background-color: #3d3d3d;
+            color: white;
+            text-align: right;
+            padding: 25px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            min-height: 100px;
+            word-wrap: break-word;
+        }
+
+        .current-input {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .history {
+            font-size: 1rem;
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+
+        /* 按钮网格 */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        /* 按钮样式 */
+        button {
+            padding: 18px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            background-color: #4d4d4d;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: #5d5d5d;
+            transform: scale(0.97);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* 功能按钮 */
+        .function-btn {
+            background-color: #6d6d6d;
+            color: #ffffff;
+        }
+
+        /* 运算符按钮 */
+        .operator-btn {
+            background-color: #ff9500;
+            font-size: 1.4rem;
+        }
+
+        /* 归零按钮 - 红色 */
+        .clear-btn {
+            background-color: #ff3b30;
+        }
+
+        .clear-btn:hover {
+            background-color: #ff4f45;
+        }
+
+        /* 等于按钮 */
+        .equals-btn {
+            background-color: #ff9500;
+            grid-column: span 2;
+        }
+
+        /* 高级运算按钮 */
+        .advanced-btn {
+            background-color: #8e8e93;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <!-- 显示区域 -->
+        <div class="display">
+            <div class="history" id="history"></div>
+            <div class="current-input" id="display">0</div>
+        </div>
+
+        <!-- 按钮区域 -->
+        <div class="buttons">
+            <button class="advanced-btn" onclick="appendToDisplay('²')">x²</button>
+            <button class="advanced-btn" onclick="appendToDisplay('³')">x³</button>
+            <button class="function-btn" onclick="appendToDisplay('%')">%</button>
+            <button class="clear-btn" onclick="clearDisplay()">C</button>
+
+            <button class="function-btn" onclick="appendToDisplay('7')">7</button>
+            <button class="function-btn" onclick="appendToDisplay('8')">8</button>
+            <button class="function-btn" onclick="appendToDisplay('9')">9</button>
+            <button class="operator-btn" onclick="appendToDisplay('/')">÷</button>
+
+            <button class="function-btn" onclick="appendToDisplay('4')">4</button>
+            <button class="function-btn" onclick="appendToDisplay('5')">5</button>
+            <button class="function-btn" onclick="appendToDisplay('6')">6</button>
+            <button class="operator-btn" onclick="appendToDisplay('*')">×</button>
+
+            <button class="function-btn" onclick="appendToDisplay('1')">1</button>
+            <button class="function-btn" onclick="appendToDisplay('2')">2</button>
+            <button class="function-btn" onclick="appendToDisplay('3')">3</button>
+            <button class="operator-btn" onclick="appendToDisplay('-')">−</button>
+
+            <button class="function-btn" onclick="appendToDisplay('0')">0</button>
+            <button class="function-btn" onclick="appendToDisplay('.')">.</button>
+            <button class="equals-btn" onclick="calculate()">=</button>
+            <button class="operator-btn" onclick="appendToDisplay('+')">+</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let history = document.getElementById('history');
+        let currentInput = '0';
+
+        // 更新显示
+        function updateDisplay() {
+            display.textContent = currentInput;
+        }
+
+        // 追加内容到显示框
+        function appendToDisplay(value) {
+            // 处理平方运算
+            if (value === '²') {
+                currentInput = String(Math.pow(parseFloat(currentInput), 2));
+                updateDisplay();
+                return;
+            }
+            
+            // 处理立方运算
+            if (value === '³') {
+                currentInput = String(Math.pow(parseFloat(currentInput), 3));
+                updateDisplay();
+                return;
+            }
+
+            if (currentInput === '0' && value !== '.') {
+                currentInput = value;
+            } else {
+                currentInput += value;
+            }
+            updateDisplay();
+        }
+
+        // 清空显示
+        function clearDisplay() {
+            currentInput = '0';
+            history.textContent = '';
+            updateDisplay();
+        }
+
+        // 计算结果
+        function calculate() {
+            try {
+                // 替换×÷为标准运算符
+                let expression = currentInput.replace('×', '*').replace('÷', '/');
+                let result = eval(expression);
+                
+                // 显示历史计算式
+                history.textContent = currentInput;
+                currentInput = String(result);
+                updateDisplay();
+            } catch (error) {
+                currentInput = '错误';
+                updateDisplay();
+                setTimeout(() => {
+                    currentInput = '0';
+                    updateDisplay();
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>
